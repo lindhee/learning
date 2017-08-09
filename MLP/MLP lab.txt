@@ -1,0 +1,22 @@
+
+För att testa MLP, tänkte jag prova att identifiera bilder.
+
+Jag använder ett dataset från MNIST (http://yann.lecun.com/exdb/mnist/), med bilder av handskrivna siffror. Varje bild är 28*28 pixlar stor och i gråskala. Det finns 60 000 träningsbilder och 10 000 testbilder.
+
+För att formulera min MLP och träna den, ska jag använda TensorFlow (https://www.tensorflow.org/get_started/get_started).
+
+1) Testa med en enlagers perceptron, för att komma igång med TensorFlow. Skriv ut vikterna för någon siffra som en bitmap.
+- Träffsäkerheten med 1000 epochs blir ca 91%. Borde hamna kring 92% enligt TensorFlows tutorial.
+- Att använda en kvadratisk kostnadsfkn ger ca 2%e lägre träffsäkerhet.
+- Det blev lite bättre träffsäkerhet med 10000 epochs. Kan vi använda valideringsdata för att sluta träningen när träffsäkerheten slutar sjunka?
+
+2) Gör en tvålagers MLP och testa igen.
+- Jag testade en MLP på formen y = softmax(W*sigmoid(V*x + b) + c), med bredden M på det dolda lagret.
+- När jag tränar med M = 10 och 100 000 epochs, blir träffsäkerheten 65%. I enlagerfallet hade vi 7850 vikter att ställa in, och nu är det 110 st till, så det har inte blivit så värst många fler frihetsgrader, så att det borde krävas mycket mer träning för att få samma precision som i enlagersfallet. Har jag skrivit något fel? Om jag testar med modellen y = softmax(sigmoid(V*x + b) + c) (M=10 och 1000 epochs) så blir det bara 55% precision. Är det sigmoid-funktionen som ställer till det?
+
+3) Prova med convolutional network, enligt deras tutorial.
+
+
+Allmänt:
+- På vilket sätt är MNIST-bilderna förbehandlade? Det verkar som att man t.ex. har centrerat bilden kring tyngdpunkten för pixlarna, normerat gråskalan och skalat storleken.
+- 
