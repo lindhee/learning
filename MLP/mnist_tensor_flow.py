@@ -5,8 +5,13 @@
 import mnist
 import numpy as np
 import tensorflow as tf
+import os
 from tensorflow.examples.tutorials.mnist import input_data
-mn = input_data.read_data_sets("/home/lindhe/Documents/Self studies/code/MLP/MNIST_data/", one_hot=True)
+
+# Path to MNIST data should be relative to current working directory.
+cwd = os.getcwd()
+mnist_path = cwd + "/MNIST_data"
+mn = input_data.read_data_sets(mnist_path, one_hot=True)
 
 # Display an example image
 if (False):
