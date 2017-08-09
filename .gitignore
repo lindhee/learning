@@ -1,0 +1,3 @@
+# Lists what file types GIT should ignore
+*.pyc
+
