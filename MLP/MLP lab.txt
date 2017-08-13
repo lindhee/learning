@@ -24,9 +24,6 @@ Att prova:
 
 Slutsats: Regularisering, byte av kostnadsfunktion och att skala initialvärdena verkar främst påverka hur fort inlärningen går. Men antalet neuroner i det dolda lagret verkar ha störst effekt på den slutliga precisionen.
 
-3) Prova med convolutional network, enligt deras tutorial.
-
-
 Allmänt:
-- På vilket sätt är MNIST-bilderna förbehandlade? Det verkar som att man t.ex. har centrerat bilden kring tyngdpunkten för pixlarna, normerat gråskalan och skalat storleken.
-- 
+- På vilket sätt är MNIST-bilderna förbehandlade? Det verkar som att man t.ex. har centrerat bilden kring tyngdpunkten för pixlarna, normerat gråskalan och skalat storleken. Undrar hur mycket praktisk intuition som gått in i den förbehandlingen, och jag inte märker här...
+

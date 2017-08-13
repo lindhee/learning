@@ -29,7 +29,7 @@ x = tf.placeholder(tf.float32, (None, 784))
 
 # Width, weights and biases for hidden layer (Gaussian distributed)
 # Scale the distribution of the initial weights, to avoid saturation in the inner layers
-M = 200
+M = 15
 W1 = tf.Variable(tf.random_normal((784, M), stddev=1.0/math.sqrt(785)))
 b1 = tf.Variable(tf.random_normal((1, M), stddev=1.0/math.sqrt(785)))
 
