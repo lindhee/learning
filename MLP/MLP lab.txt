@@ -13,7 +13,16 @@ För att formulera min MLP och träna den, ska jag använda TensorFlow (https://
 2) Gör en tvålagers MLP och testa igen.
 - Jag testade en MLP på formen y = sigmoid(W2*sigmoid(W1*x + b1) + b2), med bredden M=15 på det dolda lagret, så som föreslås i "http://neuralnetworksanddeeplearning.com/chap1.html" av Michael Nielsen.
 - Jag fick ~67-77% noggranhet när jag testade, och det var ganska robust för ändringar i eta (mellan 1 och 5), om det var softmax eller sigmoid som aktiveringsfunktion i sista lagret, och vilken kostnadsfunktion jag använde (kvadratfelet eller cross-entropy). Men Neilsens bok förutsäger 95% precision. Efter ett tag hittade jag att det blev kring 93% när jag initialiserade vikterna med normalfördelade värden istf nollor. Märkligt att det är så känsligt!
+- Med M=15 neuroner i mellanlagret, eta=3.0, kvadratisk kostnadsfkn, startvikterna fördelade enligt N(0,1) och sigmoidfunktion i utdatalagret, får jag ca 93% korrekt.
 
+Att prova:
+- Regularisera vikterna, för att undvika överanpassning: Ger ca 93% igen, men det går fortare att konvergera. (Se bild.)
+- Testa M=100: Ger 97% precision (se bild).
+- Använd cross-entropy som kostnadsfunktion, för att undvika problem för att utdatalagret mättar: 93,0% utan och 93,5% med regularisering (med M=15)
+- Initialisera vikterna med en skalad normalfördelning, för att undvika problem med att det dolda lagret mättar: Stannar på 93%, men verkar konvergera väldigt fort - den låg på 91% redan efter första epoken!
+- Sedan provade jag att ha kvar förbättringarna ovan, och ta M=50. Det gav 96,5% precision, redan vid epok 20. Med M=100 fick jag 97,7% vid epok 21 och med M=200 blev rekordet 98,2% precision vid epok 22.
+
+Slutsats: Regularisering, byte av kostnadsfunktion och att skala initialvärdena verkar främst påverka hur fort inlärningen går. Men antalet neuroner i det dolda lagret verkar ha störst effekt på den slutliga precisionen.
 
 3) Prova med convolutional network, enligt deras tutorial.
 
