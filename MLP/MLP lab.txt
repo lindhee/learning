@@ -11,8 +11,9 @@ För att formulera min MLP och träna den, ska jag använda TensorFlow (https://
 - Det blev lite bättre träffsäkerhet med 10000 epochs. Kan vi använda valideringsdata för att sluta träningen när träffsäkerheten slutar sjunka?
 
 2) Gör en tvålagers MLP och testa igen.
-- Jag testade en MLP på formen y = softmax(W*sigmoid(V*x + b) + c), med bredden M på det dolda lagret.
-- När jag tränar med M = 10 och 100 000 epochs, blir träffsäkerheten 65%. I enlagerfallet hade vi 7850 vikter att ställa in, och nu är det 110 st till, så det har inte blivit så värst många fler frihetsgrader, så att det borde krävas mycket mer träning för att få samma precision som i enlagersfallet. Har jag skrivit något fel? Om jag testar med modellen y = softmax(sigmoid(V*x + b) + c) (M=10 och 1000 epochs) så blir det bara 55% precision. Är det sigmoid-funktionen som ställer till det?
+- Jag testade en MLP på formen y = sigmoid(W2*sigmoid(W1*x + b1) + b2), med bredden M=15 på det dolda lagret, så som föreslås i "http://neuralnetworksanddeeplearning.com/chap1.html" av Michael Nielsen.
+- Jag fick ~67-77% noggranhet när jag testade, och det var ganska robust för ändringar i eta (mellan 1 och 5), om det var softmax eller sigmoid som aktiveringsfunktion i sista lagret, och vilken kostnadsfunktion jag använde (kvadratfelet eller cross-entropy). Men Neilsens bok förutsäger 95% precision. Efter ett tag hittade jag att det blev kring 93% när jag initialiserade vikterna med normalfördelade värden istf nollor. Märkligt att det är så känsligt!
+
 
 3) Prova med convolutional network, enligt deras tutorial.
 

@@ -53,9 +53,16 @@ tf.global_variables_initializer().run()
 
 # Train M epochs, in each epoch we use 100 random values from the training data
 M = 1000
-for _ in range(M):
-  batch_xs, batch_ys = mn.train.next_batch(100)
-  sess.run(train_step, feed_dict={x: batch_xs, t: batch_ys})
+for i in range(M):
+    batch_xs, batch_ys = mn.train.next_batch(100)
+    sess.run(train_step, feed_dict={x: batch_xs, t: batch_ys})
+  
+    if i%100==0:    
+        # Report how the model performs
+        correct_predictions = tf.equal(tf.argmax(y,1), tf.argmax(t,1))
+        accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
+        accuracy_result = sess.run(accuracy, feed_dict={x: mn.test.images, t: mn.test.labels})
+        print("Round {0}: {1:.1f}% correct.".format(i, 100*accuracy_result))
 
 # Check the resulting weights
 weights = W.value().eval() # Gives a 784*10 numpy array
