@@ -50,26 +50,28 @@ def kmeansclustering(x, k):
         
         # Update cluster centers
         for j in range(0,k):
-            c[j,:] = x[clusterIndex==j,:].mean(axis=0)
+            if np.any(clusterIndex==j):
+                # Don't update if the cluster has no members
+                c[j,:] = x[clusterIndex==j,:].mean(axis=0)
     
     return c
     
 # Test code
+def runTest():
+    # Generate data from some normal distributions
+    N = 30 # No of samples from each class
+    covariance = 0.2*np.eye(2)
+    x0 = np.random.multivariate_normal(np.array((0,0)),covariance,N) # Class 0
+    x1 = np.random.multivariate_normal(np.array((5,5)),covariance,N) # Class 1
+    x2 = np.random.multivariate_normal(np.array((5,0)),covariance,N) # Class 2
+    x = np.vstack((x0,x1,x2))
 
-# Generate data from some normal distributions
-N = 30 # No of samples from each class
-covariance = 0.2*np.eye(2)
-x0 = np.random.multivariate_normal(np.array((0,0)),covariance,N) # Class 0
-x1 = np.random.multivariate_normal(np.array((5,5)),covariance,N) # Class 1
-x2 = np.random.multivariate_normal(np.array((5,0)),covariance,N) # Class 2
-x = np.vstack((x0,x1,x2))
+    # Do clustering
+    c = kmeansclustering(x,3)
 
-# Do clustering
-c = kmeansclustering(x,3)
-
-# Plot result
-plt.plot(x[:,0],x[:,1],"b.")
-plt.plot(c[:,0],c[:,1],"gx")
-plt.show()
+    # Plot result
+    plt.plot(x[:,0],x[:,1],"b.")
+    plt.plot(c[:,0],c[:,1],"gx")
+    plt.show()
 
 
