@@ -77,24 +77,33 @@ validt = target[1::4]
 test = iris[3::4,0:4] # Every fourth row, starting at 3
 testt = target[3::4]
 
-# Do k-means clustering of the training data, to get 3*kprot prototype vectors
-kprot = 2
-p0 = km.kmeansclustering(train[traint[:,0]==1,:],kprot)
-p1 = km.kmeansclustering(train[traint[:,1]==1,:],kprot)
-p2 = km.kmeansclustering(train[traint[:,2]==1,:],kprot)
-p = np.vstack((p0, p1, p2))
-k = p.shape[0]
+if (False):
+    # Do k-means clustering of each category of the training data, to get 3*kprot prototype vectors
+    kprot = 2
+    p0 = km.kmeansclustering(train[traint[:,0]==1,:],kprot)
+    p1 = km.kmeansclustering(train[traint[:,1]==1,:],kprot)
+    p2 = km.kmeansclustering(train[traint[:,2]==1,:],kprot)
+    p = np.vstack((p0, p1, p2))
 
-# Choose beta for each prototype
-# (The activation function is exp(-beta*||x-p||). )
-b0 = 1/(2*clusterVariance(p0, train[traint[:,0]==1,:]))
-b1 = 1/(2*clusterVariance(p1, train[traint[:,1]==1,:]))
-b2 = 1/(2*clusterVariance(p2, train[traint[:,2]==1,:]))
-beta = np.vstack((b0, b1, b2))
-print("Beta:")
-print(beta)
+    # Choose beta for each prototype
+    # (The activation function is exp(-beta*||x-p||). )
+    b0 = 1/(2*clusterVariance(p0, train[traint[:,0]==1,:]))
+    b1 = 1/(2*clusterVariance(p1, train[traint[:,1]==1,:]))
+    b2 = 1/(2*clusterVariance(p2, train[traint[:,2]==1,:]))
+    beta = np.vstack((b0, b1, b2))
+    print("Beta:")
+    print(beta)
+else:
+    # Do k-means clustering on all data points at once
+    ktotal = 10
+    p = km.kmeansclustering(train,ktotal)
+
+    # Choose beta for each prototype
+    # (The activation function is exp(-beta*||x-p||). )
+    beta = 1/(2*clusterVariance(p, train))
 
 # Train the neural network
+k = p.shape[0]
 N = train.shape[0]
 M = traint.shape[1] # No of output nodes
 T = np.zeros((M,N)) # Targets

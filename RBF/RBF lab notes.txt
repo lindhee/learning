@@ -1,0 +1,14 @@
+
+Anteckningar om RBF-labben:
+
+- Jag har klustrat varje kategori av data för sig, med 2-3 kluster per kategori. Men Marsland klustrar alla datapunkter tillsammans. 
+
+- Med 2 kluster/kategori hamnar man oftast kring 94% precision på testdata.
+
+- Om jag väljer 3 kluster/kategori, så blir det ibland 97% och ibland 89%. Jag tolkar det som att risken för överanpassning ökar, med så många kluster.
+
+- Om jag klustrar alla datapunkter tillsammans, placerar algoritmen endast 1-2 punkter bland de blåa punkterna, och lägger alla andra i det blandade klustret. Eftersom vi inte bryr oss om kategorierna i det steget, antar jag att det beror på att den övre gruppen är mindre sammanhållen?
+-- Med k=5 kluster får jag 86-94% precision.
+-- Med k=10 kluster blir det 94% precision.
+ 
+ 
