@@ -1,0 +1,15 @@
+
+Labb om faltande nätverk, för att klassificera bilder
+==========================================================
+Bl.a. baserat på boken "Deep learning" av Goodfellow et. al.
+
+Det finns 25 000 träningsbilder med etikett, och 12 500 testbilder utan etikett. De är avsedda för tävlingen, men jag lägger testbilderna åt sidan och avsätter 5000 träningsbilder som testdata.
+
+Bilderna har inte samma storlek, och inte ens samma proportioner. Antingen löser jag det genom förbehandling (padda till en viss proportion och skala sedan till viss storlek), eller genom att mitt CNN får hantera bilder av olika storlek. I boken (sid 350) rekommenderar de att lägga in ett pooling-lager som varierar storleken på sina pooling-områden, för att få fast storlek på utdata.
+
+
+
+
+
+
+
