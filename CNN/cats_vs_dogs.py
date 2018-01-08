@@ -16,9 +16,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 # Path to images should be relative to current working directory.
 cwd = os.getcwd()
-imageFilter = cwd + "/data/small/*.jpg"
-
-(image_batch, label_batch) = CNNU.loadImages(imageFilter)
+(image_batch, label_batch) = CNNU.loadImages(cwd + "/data/small_train/*.jpg")
+(test_image_batch, test_label_batch) = CNNU.loadImages(cwd + "/data/small_test/*.jpg")
 
 x = tf.placeholder(tf.float32, (None, 200, 200), name="x")
   
@@ -39,7 +38,8 @@ print("y: " + str(y.shape))
 print("t: " + str(t.shape))
 
 # Cross entropy cost function
-loss_fcn = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=t, logits=y))
+loss_fcn = tf.reduce_mean((t-y)*(t-y))
+#loss_fcn = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=t, logits=y))
 train_step = tf.train.GradientDescentOptimizer(3.0).minimize(loss_fcn)
 
 # Start a new session to show example output.
@@ -53,7 +53,7 @@ with tf.Session() as sess:
     sess.run(tf.local_variables_initializer())
     
     # Initialize the global variables (such as weights)
-    tf.global_variables_initializer().run()
+    sess.run(tf.global_variables_initializer())
 
     # Coordinate the loading of image files.
     coord = tf.train.Coordinator()
@@ -72,11 +72,12 @@ with tf.Session() as sess:
             sess.run(train_step, feed_dict={x: im_batch, t: l_batch})
             
         # Report how the model performs
-        #correct_predictions = tf.equal(tf.argmax(y,1), tf.argmax(t,1))
-        #accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
-        #accuracy_result = sess.run(accuracy, feed_dict={x: mn.test.images, t: mn.test.labels})
-        #print("Epoch {0}: {1:.1f}% correct.".format(e, 100*accuracy_result))
-        #epoch_accuracies[e]=accuracy_result
+        correct_predictions = tf.equal(y, t)
+        accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
+        test_im_batch, test_l_batch = sess.run([test_image_batch, test_label_batch])
+        accuracy_result = sess.run(accuracy, feed_dict={x: test_im_batch, t: test_l_batch})
+        print("Epoch {0}: {1:.1f}% correct.".format(e, 100*accuracy_result))
+        epoch_accuracies[e]=accuracy_result
 
     # Finish off the filename queue coordinator.
     coord.request_stop()

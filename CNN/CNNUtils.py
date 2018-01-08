@@ -59,7 +59,7 @@ def loadImages(imageFileNamePattern):
     #   determines the maximum we will prefetch.  Recommendation:
     #   min_after_dequeue + (num_threads + a small safety margin) * batch_size
     min_after_dequeue = 10
-    batch_size = 5
+    batch_size = 10
     capacity = min_after_dequeue + 3 * batch_size
     image_batch, label_batch = tf.train.shuffle_batch(
       [squeezed_image, float_label], batch_size=batch_size, capacity=capacity,
