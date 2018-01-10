@@ -65,7 +65,8 @@ def train():
     # Force input pipeline to CPU:0 to avoid operations sometimes ending up on
     # GPU and resulting in a slow down.
     with tf.device('/cpu:0'):
-      images, labels = cifar10.distorted_inputs()
+      useEvaluationData = False
+      images, labels = cifar10.inputs(useEvaluationData)
 
     # Build a Graph that computes the logits predictions from the
     # inference model.
