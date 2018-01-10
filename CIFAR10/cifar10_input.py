@@ -30,9 +30,11 @@ import tensorflow as tf
 IMAGE_SIZE = 24
 
 # Global constants describing the CIFAR-10 data set.
-NUM_CLASSES = 10
-NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 50000
-NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
+# Note: We filter the data to only keep the cat and dog categories.
+# Each file contains at least 1950 cats or dogs.
+NUM_CLASSES = 2
+NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 5*1950
+NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 1950
 
 
 def read_cifar10(filename_queue):
