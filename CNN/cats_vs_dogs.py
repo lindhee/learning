@@ -16,8 +16,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 # Path to images should be relative to current working directory.
 cwd = os.getcwd()
-(image_batch, label_batch) = CNNU.loadImages(cwd + "/data/small_train/*.jpg")
-(test_image_batch, test_label_batch) = CNNU.loadImages(cwd + "/data/small_test/*.jpg")
+(image_batch, label_batch) = CNNU.loadImages(cwd + "/data/small_train/*.jpg", 10)
+(test_image_batch, test_label_batch) = CNNU.loadImages(cwd + "/data/test/*.jpg", 1000)
 
 x = tf.placeholder(tf.float32, (None, 200, 200), name="x")
   
@@ -61,7 +61,6 @@ with tf.Session() as sess:
 
     # Train some epochs, in each epoch we use a random subset of images from the training data
     no_of_epochs = 30
-    no_of_images_per_batch = 10
     print("Starting {} epochs of stochastic gradient descent.".format(no_of_epochs))
     epoch_accuracies=np.zeros(no_of_epochs)
     epoch_indices=np.arange(0,no_of_epochs)

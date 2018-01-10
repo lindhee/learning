@@ -8,9 +8,10 @@ import tensorflow as tf
 
 # imageFileNamePattern is a string with a regexp that matches 
 # all file names that should be loaded.
+# batchSize is the no of samples in each batch
 # Returns:
 # (image_batch, label_batch)  
-def loadImages(imageFileNamePattern):
+def loadImages(imageFileNamePattern, batchSize):
 
     print("Reading files: " + imageFileNamePattern)
 
@@ -59,10 +60,9 @@ def loadImages(imageFileNamePattern):
     #   determines the maximum we will prefetch.  Recommendation:
     #   min_after_dequeue + (num_threads + a small safety margin) * batch_size
     min_after_dequeue = 10
-    batch_size = 10
-    capacity = min_after_dequeue + 3 * batch_size
+    capacity = min_after_dequeue + 3 * batchSize
     image_batch, label_batch = tf.train.shuffle_batch(
-      [squeezed_image, float_label], batch_size=batch_size, capacity=capacity,
+      [squeezed_image, float_label], batch_size=batchSize, capacity=capacity,
       min_after_dequeue=min_after_dequeue)
       
     return (image_batch, label_batch)  
