@@ -100,7 +100,7 @@ with tf.Session() as sess:
             sess.run(train_step, feed_dict={x: im_batch, t: l_batch})
             
         # Report how the model performs
-        correct_predictions = tf.equal(y, t)
+        correct_predictions = tf.equal(tf.argmax(y,axis=1), tf.argmax(t,axis=1))
         accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
         test_im_batch, test_l_batch = sess.run([test_image_batch, test_label_batch])
         accuracy_result = sess.run(accuracy, feed_dict={x: test_im_batch, t: test_l_batch})
