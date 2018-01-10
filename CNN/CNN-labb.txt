@@ -7,6 +7,13 @@ Det finns 25 000 träningsbilder med etikett, och 12 500 testbilder utan etikett
 
 Bilderna har inte samma storlek, och inte ens samma proportioner. Antingen löser jag det genom förbehandling (padda till en viss proportion och skala sedan till viss storlek), eller genom att mitt CNN får hantera bilder av olika storlek. I boken (sid 350) rekommenderar de att lägga in ett pooling-lager som varierar storleken på sina pooling-områden, för att få fast storlek på utdata.
 
+Steg 1 (commit 72c8ac0008995187a27f04e75fe5455029a342dc):
+Nu funkar det att ladda in bilddata (som jag brutalt skalar om till 200*200 px, drar bort medelvärdet och normaliserar variansen till 1). Jag tränar ett trivialt enlagers nätverk, som får ca 50% noggrannhet, dvs det väljer i princip slumpmässigt. Har lagt undan 1000 bilder (500 katter och 500 hundar) som testdata.
+
+Steg 2:
+Kopiera strukturen från AlexNet (5 faltande lager, sen 3 fullt sammankopplade), som vann ImageNet 2012.
+
+
 
 
 

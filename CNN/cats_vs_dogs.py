@@ -12,27 +12,56 @@ import math
 import CNNUtils as CNNU
 
 # Remove TensorFlow warnings about unused GPU instructions
-os.environ['TF_CPP_MIN_LOG_LEVEL']='2' 
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+
+# We have classes cats and dogs
+NUM_CLASSES = 2
+
+trainingBatchSize = 10
 
 # Path to images should be relative to current working directory.
 cwd = os.getcwd()
-(image_batch, label_batch) = CNNU.loadImages(cwd + "/data/small_train/*.jpg", 10)
+(image_batch, label_batch) = CNNU.loadImages(cwd + "/data/small_train/*.jpg", trainingBatchSize)
 (test_image_batch, test_label_batch) = CNNU.loadImages(cwd + "/data/test/*.jpg", 1000)
 
-x = tf.placeholder(tf.float32, (None, 200, 200), name="x")
-  
-# Define a single fully connected layer with a one-dimensional input vector
-Nc = 200*200 # tf.shape(x)[1]*tf.shape(x)[2]
-xFlat = tf.reshape(x,(tf.shape(x)[0], Nc))
+x = tf.placeholder(tf.float32, (None, 20, 20, 1), name="x")
 
-W1 = tf.Variable(tf.random_normal((Nc, 1), stddev=1.0/math.sqrt(Nc)), name="W1")
-b1 = tf.Variable(tf.random_normal([], stddev=1.0), name="b1")
+# Conv1: 5*5 kernel with 64 output channels
+kernel1 = tf.Variable(tf.random_normal([5,5,1,64], stddev=1.0/math.sqrt(5*5)),name='kernel1')
+conv1 = tf.nn.conv2d(x, kernel1, strides=[1, 1, 1, 1], padding='SAME',name='conv1')
+bias1 = tf.Variable(tf.random_normal([64]), name='bias1')
+preActivation1 = tf.nn.bias_add(conv1, bias1)
+out1 = tf.nn.relu(preActivation1, name='conv1_out')
+# pool1
+pool1 = tf.nn.max_pool(out1, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1], padding='SAME', name='pool1')
+# norm1
+norm1 = tf.nn.lrn(pool1, 4, bias=1.0, alpha=0.001 / 9.0, beta=0.75, name='norm1')
 
-# TensorFlow model: y = sigmoid(W1*xFlat + b1)
-y = tf.sigmoid(tf.matmul(xFlat, W1) + b1)
+print("Norm1: " + str(norm1.shape))
+
+# Fully connected layer 1, with 20 outputs
+# Move everything into depth so we can perform a single matrix multiply.
+noOfOutputs1 = 20
+reshape1 = tf.reshape(norm1, [-1, 10*10*64])
+dim = reshape1.get_shape()[1].value
+weights1 = tf.Variable(tf.random_normal([dim, noOfOutputs1], stddev=0.04),name='a1')
+loc_bias1 = tf.Variable(tf.random_normal([noOfOutputs1], mean=0.1), name='loc_bias1')
+local1 = tf.nn.relu(tf.matmul(reshape1, weights1) + loc_bias1, name='local1')
+
+print("Local1: " + str(local1.shape))
+
+# Linear layer(WX + b),
+# We don't apply softmax here because
+# tf.nn.sparse_softmax_cross_entropy_with_logits accepts the unscaled logits
+# and performs the softmax internally for efficiency.
+linWeights = tf.Variable(tf.random_normal([noOfOutputs1, NUM_CLASSES], stddev=1/noOfOutputs1),name='linWeights')
+linBias = tf.Variable(tf.random_normal([NUM_CLASSES], stddev=1/NUM_CLASSES),name='linBias')
+softmax_linear = tf.add(tf.matmul(local1, linWeights), linBias, name='softmax_linear')
+    
+y = softmax_linear    
 
 # Correct labels, used as targets
-t = tf.placeholder(tf.float32, (None, 1),name="t")
+t = tf.placeholder(tf.float32, (None, 2),name="t")
 
 print("y: " + str(y.shape))
 print("t: " + str(t.shape))
