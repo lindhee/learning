@@ -8,6 +8,13 @@ Det finns 25 000 träningsbilder med etikett, och 12 500 testbilder utan etikett
 Bilderna har inte samma storlek, och inte ens samma proportioner. Antingen löser jag det genom förbehandling (padda till en viss proportion och skala sedan till viss storlek), eller genom att mitt CNN får hantera bilder av olika storlek. I boken (sid 350) rekommenderar de att lägga in ett pooling-lager som varierar storleken på sina pooling-områden, för att få fast storlek på utdata.
 
 
+CIFAR 10:
+=============
+För att få igång deras tutorial, fick jag manuellt ladda ner CIFAR 10-data från "https://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz" och sen kopiera gz-filen till /home/lindhe/install/cifar10_data. Sen pekade jag om så att det blev installationskatalogen.
+
+
+
+
 
 
 
