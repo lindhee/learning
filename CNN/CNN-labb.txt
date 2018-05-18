@@ -17,8 +17,6 @@ Kör "tensorboard --logdir=/tmp/cifar10_train" för att starta TensorBoard. Titt
 
 Jag körde CNN-tutorialen i originalskick, och efter 14,5 timmars träning på min laptop, kom jag upp till ca 85,7% precision @ 1. Då var kostnadsfunktionen omkring 2,3 när den tränade. Se skärmdump (av en annan kostnadsfkn) i "CNN tutorial learning curve.png".
 
-Nästa steg blir att skala bort alla bilder utom katter och hundar och träna igen.
-
 För att få igång det på seshat:
 - Fixa proxyn för att kunna klona mitt git-repo:
 git config --global https.proxy https://proxy.se.electrolux.com:8080
@@ -49,6 +47,8 @@ screen -r
 Skriv sen "exit" för att avsluta screen-sessionen.
 
 Efter en natt på Seshat (från kl 18 till 08, dvs 14 h) var precision @ 1 = 86,8% och kostnadsfkn ungefär 0,5.
+
+Nästa steg blir att skala bort alla bilder utom katter och hundar och träna igen.
 
 
 

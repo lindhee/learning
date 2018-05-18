@@ -5,8 +5,8 @@
 CHUNK_SIZE = 1 + 32*32*3 # No of bytes for each image (each pixel has RGB bytes)
 
 fileNames = ["data_batch_1.bin", "data_batch_2.bin", "data_batch_3.bin", "data_batch_4.bin", "data_batch_5.bin", "test_batch.bin"]
-inputDir = "/tmp/cifar10_data/cifar-10-batches-bin/"
-outputDir = "/tmp/cifar10_data/cifar-10-batches-bin/filtered/"
+inputDir = "/home/lindhe/install/cifar10_data/cifar-10-batches-bin/"
+outputDir = "/home/lindhe/install/cifar2_data/cifar-10-batches-bin/"
 
 for fileName in fileNames:
     inFileName = inputDir + fileName
