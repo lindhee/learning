@@ -12,6 +12,48 @@ CIFAR 10:
 =============
 För att få igång deras tutorial, fick jag manuellt ladda ner CIFAR 10-data från "https://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz" och sen kopiera gz-filen till /home/lindhe/install/cifar10_data. Sen pekade jag om så att det blev installationskatalogen.
 
+För att köra TensorBoard:
+Kör "tensorboard --logdir=/tmp/cifar10_train" för att starta TensorBoard. Titta sedan på "localhost:6006" med webbläsaren.
+
+Jag körde CNN-tutorialen i originalskick, och efter 14,5 timmars träning på min laptop, kom jag upp till ca 85,7% precision @ 1. Då var kostnadsfunktionen omkring 2,3 när den tränade. Se skärmdump (av en annan kostnadsfkn) i "CNN tutorial learning curve.png".
+
+Nästa steg blir att skala bort alla bilder utom katter och hundar och träna igen.
+
+För att få igång det på seshat:
+- Fixa proxyn för att kunna klona mitt git-repo:
+git config --global https.proxy https://proxy.se.electrolux.com:8080
+git config --global http.proxy http://proxy.se.electrolux.com:8080
+
+- Klona mitt github-repo:
+git clone https://github.com/lindhee/learning.git
+
+- Skapa och starta en virtual environment på seshat:
+virtualenv --system-site-packages ~/install/tensorflow
+source ~/install/tensorflow/bin/activate
+
+- Ange proxy inuti virtual environment:
+export https_proxy="proxy.se.electrolux.com:8080"
+
+- Installera tensorflow, version 1.5 (för 1.7 krashar med en coredump när man försöker importera den):
+pip install tensorflow==1.5
+
+- Startade en träning inuti en screen-session, med låg process-prio (se https://help.ubuntu.com/community/Screen):
+screen
+nice -20 python cifar10_train.py
+[Tryck Ctrl+A och sen d]
+logout
+
+- Efter att ha loggat på igen:
+screen -list
+screen -r
+Skriv sen "exit" för att avsluta screen-sessionen.
+
+Efter en natt på Seshat (från kl 18 till 08, dvs 14 h) var precision @ 1 = 86,8% och kostnadsfkn ungefär 0,5.
+
+
+
+
+
 
 
 
