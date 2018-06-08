@@ -50,6 +50,22 @@ Efter en natt på Seshat (från kl 18 till 08, dvs 14 h) var precision @ 1 = 86,
 
 Nästa steg blir att skala bort alla bilder utom katter och hundar och träna igen.
 
+Jag tränade med bara katter och hundar ("CIFAR 2") över en helg, och fick en kostnadsfkn på 0,02. Men precision @1 blev bara 69,9%! Hur kommer det sig? Det verkar som att testfunktionen testar på mitt decimerade dataset, så där hittar jag inget fel.
+
+Startade en ny träningsomgång 2018-05-21T11:20 för att se om resultatet håller i sig. 2018-05-22T08:37 var kostnadsfkn 0,02 och precision @1 67,6%. Så det verkar ganska repeterbart.
+
+Träna original-nätverket på CIFAR10-data en gång till, och spara undan senaste snapshot så vi har ett tränat nätverk tillgängligt. Testa hur bra det presterar på CIFAR2-data - kanske går det sämre om vi bara testar med katter och hundar? Eller kan mitt nätverk ha blivit lidande av att det ser färre träningsdata? Kanske borde jag träna det på tre kategorier (katter, hundar och annat) för att få det lika bra?
+
+Kolla ev. in en tutorial som jag bokmärkte, som bara tar 3-4 h att träna upp.
+
+
+
+
+
+
+
+
+
 
 
 
