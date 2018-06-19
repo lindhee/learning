@@ -46,28 +46,40 @@ screen -list
 screen -r
 Skriv sen "exit" för att avsluta screen-sessionen.
 
+Kolla ev. in en tutorial som jag bokmärkte, som bara tar 3-4 h att träna upp.
+
 Efter en natt på Seshat (från kl 18 till 08, dvs 14 h) var precision @ 1 = 86,8% och kostnadsfkn ungefär 0,5.
 
 Nästa steg blir att skala bort alla bilder utom katter och hundar och träna igen.
 
 Jag tränade med bara katter och hundar ("CIFAR 2") över en helg, och fick en kostnadsfkn på 0,02. Men precision @1 blev bara 69,9%! Hur kommer det sig? Det verkar som att testfunktionen testar på mitt decimerade dataset, så där hittar jag inget fel.
 
-Startade en ny träningsomgång 2018-05-21T11:20 för att se om resultatet håller i sig. 2018-05-22T08:37 var kostnadsfkn 0,02 och precision @1 67,6%. Så det verkar ganska repeterbart.
-
-Jag tränade original-nätverket på CIFAR10-data en gång till, och sparade undan ett snapshot som referens, under cifar10_trained.
-
-Kolla ev. in en tutorial som jag bokmärkte, som bara tar 3-4 h att träna upp.
+Startade en ny träningsomgång 2018-05-21T11:20 för att se om resultatet håller i sig. 2018-05-22T08:37 var kostnadsfkn 0,02 och precision @1 = 67,6%. Så det verkar ganska repeterbart.
 
 Jag tränade CIFAR2-nätverket över en helg på seshat och fick precision @1 på 68,0%. Kostnadsfkn var 0,03. Den varianten finns sparad som referens, under cifar2_trained.
+
+Jag tränade original-nätverket på CIFAR10-data en gång till, och sparade undan ett snapshot som referens, under cifar10_trained.
 
 När jag testade det sparade tränade CIFAR10-nätverket på data som bara innehöll katter och hundar, fick jag precision @ 1 = 77,4%.
 
 Sedan gjorde jag om taggarna, så att det bara fanns tre klasser: katter, hundar och övrigt, men behöll alla exempel. Jag tränade nätverket en natt, tills kostnadsfkn verkade ha konvergerat till ca 0,1, och sparade senaste checkpoint under cifar3_trained. När jag testade så fick jag precision @ 1 till 87,2%.
 
-Hur bra presterar mitt CIFAR 3-nätverk om jag testar det på enbart hundar och katter? Jag testade nätverket med tre klasser på data med bara katter och hundar, och då fick jag precision @ 1 = 0.555.
+Hur bra presterar mitt CIFAR 3-nätverk om jag testar det på enbart hundar och katter? Jag testade nätverket med tre klasser på data med bara katter och hundar, och då fick jag precision @ 1 = 55,5%. Får jag dåliga resultat för att nätverket är tränat med 80% bilder på kategorin "övrigt", så det har en tendens att vilja välja den kategorin ofta?
 
-Testa CIFAR 10-nätverket på bara katter och hundar. Prova sedan två "enklare" kategorier, som katter och flygplan.
+Prova att slå ihop alla 4 maskiner till en kategori och 4 djur (alla utom fåglar och grodor) till en kategori. Då har vi mycket data, två lätta kategorier och lika fördelning dem emellan.
 
+0: airplane
+1: automobile
+2: bird
+3: cat
+4: deer
+5: dog
+6: frog
+7: horse
+8: ship
+9: truck
+
+Startade en sådan träning på Seshat klockan 10:27. Klockan 18:22 var kostnadsfkn 0.01 och precision @ 1 = 94,8% !! Det stämmer med att vi har mycket data och att problemet borde vara lätt, eftersom kategorierna är så olika. Sparade sista checkpoint för det nätverket under cifar2_large_trained.
 
 
 
