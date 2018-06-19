@@ -54,9 +54,11 @@ Jag tränade med bara katter och hundar ("CIFAR 2") över en helg, och fick en k
 
 Startade en ny träningsomgång 2018-05-21T11:20 för att se om resultatet håller i sig. 2018-05-22T08:37 var kostnadsfkn 0,02 och precision @1 67,6%. Så det verkar ganska repeterbart.
 
-Träna original-nätverket på CIFAR10-data en gång till, och spara undan senaste snapshot så vi har ett tränat nätverk tillgängligt. Testa hur bra det presterar på CIFAR2-data - kanske går det sämre om vi bara testar med katter och hundar? Eller kan mitt nätverk ha blivit lidande av att det ser färre träningsdata? Kanske borde jag träna det på tre kategorier (katter, hundar och annat) för att få det lika bra?
+Jag tränade original-nätverket på CIFAR10-data en gång till, och sparade undan ett snapshot som referens, under cifar10_trained.
 
 Kolla ev. in en tutorial som jag bokmärkte, som bara tar 3-4 h att träna upp.
+
+Jag tränade CIFAR2-nätverket över en helg på seshat och fick precision @1 på 68,0%. Kostnadsfkn var 0,03. Den varianten finns sparad som referens, under cifar2_trained.
 
 
 
