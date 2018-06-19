@@ -60,6 +60,14 @@ Kolla ev. in en tutorial som jag bokmärkte, som bara tar 3-4 h att träna upp.
 
 Jag tränade CIFAR2-nätverket över en helg på seshat och fick precision @1 på 68,0%. Kostnadsfkn var 0,03. Den varianten finns sparad som referens, under cifar2_trained.
 
+När jag testade det sparade tränade CIFAR10-nätverket på data som bara innehöll katter och hundar, fick jag precision @ 1 = 77,4%.
+
+Sedan gjorde jag om taggarna, så att det bara fanns tre klasser: katter, hundar och övrigt, men behöll alla exempel. Jag tränade nätverket en natt, tills kostnadsfkn verkade ha konvergerat till ca 0,1, och sparade senaste checkpoint under cifar3_trained. När jag testade så fick jag precision @ 1 till 87,2%.
+
+Hur bra presterar mitt CIFAR 3-nätverk om jag testar det på enbart hundar och katter? Jag testade nätverket med tre klasser på data med bara katter och hundar, och då fick jag precision @ 1 = 0.555.
+
+Testa CIFAR 10-nätverket på bara katter och hundar. Prova sedan två "enklare" kategorier, som katter och flygplan.
+
 
 
 
