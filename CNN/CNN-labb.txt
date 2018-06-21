@@ -68,18 +68,14 @@ Hur bra presterar mitt CIFAR 3-nätverk om jag testar det på enbart hundar och 
 
 Prova att slå ihop alla 4 maskiner till en kategori och 4 djur (alla utom fåglar och grodor) till en kategori. Då har vi mycket data, två lätta kategorier och lika fördelning dem emellan.
 
-0: airplane
-1: automobile
-2: bird
-3: cat
-4: deer
-5: dog
-6: frog
-7: horse
-8: ship
-9: truck
-
 Startade en sådan träning på Seshat klockan 10:27. Klockan 18:22 var kostnadsfkn 0.01 och precision @ 1 = 94,8% !! Det stämmer med att vi har mycket data och att problemet borde vara lätt, eftersom kategorierna är så olika. Sparade sista checkpoint för det nätverket under cifar2_large_trained.
+
+Struktur för mitt CIFAR-nätverk:
+conv1: 5*5-kernel med 3 kanaler in och 64 kanaler ut, stride 2*2
+conv2: 5*5-kernel med 64 kanaler in och 64 kanaler ut, stride 2*2
+local3: Fullt kopplat lager med 384 neuroner
+local4: Fullt kopplat lager med 192 neuroner
+utsignal: Fullt kopplat lager med 10 neuroner (sedan kommer softmax, inbyggt i kostnadsfkn)
 
 
 
