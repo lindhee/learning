@@ -1,0 +1,25 @@
+
+Att göra:
+- I would like to try adding some randomness to the game (control signal, or start state), so we excite more states.
+- Understand the Q_MAX value. Maybe print Q_MAX for each of the 11 states?
+- Investigate W. It should be easy to understand the three columns for left, straight and right.
+
+RL-bakgrund
+===============
+Om systemet befinner sig i tillstånd s och väljer aktion a, så kommer det till tillståndet s'=t(s,a) och får en belöning r'(s,a). Vi är ute efter att maximera den avklingande totala framtida belöningen r(s_t,a*) + \lambda r(s_{t+1},a*) + \lambda^2 r(s_{t+2},a*)..., där \lambda ligger inom (0,1) och a* är den optimala aktionen (i varje steg).
+
+Bör man använda Q-learning eller policy learning?
+
+Q-learning betyder att vi försöker estimera en fkn Q*(s,a) så att den är den maximala totala framtida belöningen (inkl. avklingning) som vi kan uppnå genom att göra aktion a från tillstånd s (och alltså sedan välja optimalt därefter). Belöningen för att nu vara i tillstånd s ingår alltså inte i Q. Om vi vet Q*(s,a) så kan vi i varje tillstånd s välja a = argmax_a Q*(s,t(s,a)).
+
+Om vi kör massor av drag i verkligheten eller en simulator, får vi massor av kombinationer (s,a,r',s') som vi kan lära oss av.
+Om det finns ett ändligt antal aktioner a och tillstånd s, kan vi göra en tabell Q(s,a) och uppdatera den enligt Bellmans ekvation:
+Q(s,a) := r' + \lambda max_{a'} Q(s',a').
+Om vi kör detta massor av gånger, så går Q(s,a) mot Q*(s,a).
+- Det kräver förstås att vi testar alla tillstånd och aktioner många gånger.
+- Fallgropar för konvergens?
+
+Om s har väldigt hög dimension (t.ex. består av en bild med en massa pixlar), kan det vara opraktiskt att iterera Bellmans ekvation över en tabell med alla tillstånd. Då kan vi istället träna ett neuralt nätverk till att approximera Q(s,a). För varje drag får vi en tupel (s,a,r',s') och modifierar vikterna w för att 
+Q(s,a,w) ska gå mot (det kända) värdet T = r' + \lambda max_{a'} Q(s',a',\bar w), där \bar w hålls konstant medan vi gör SGD på varje batch.
+- Samla erfarenheter och dra sedan en slumpässig kombination av drag till varje batch.
+

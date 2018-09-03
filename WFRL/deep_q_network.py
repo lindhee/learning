@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Intended for Python 2
+# Intended for Python 2.7
 
 import tensorflow as tf
 import dummy_game as game
@@ -15,9 +15,27 @@ OBSERVE = 500. # timesteps to observe before training
 EXPLORE = 500. # frames over which to anneal epsilon
 FINAL_EPSILON = 0.05 # final value of epsilon
 INITIAL_EPSILON = 1.0 # starting value of epsilon
-REPLAY_MEMORY = 590000 # number of previous transitions to remember
+REPLAY_MEMORY = 5000 # number of previous transitions to remember
 BATCH = 32 # size of minibatch
 K = 1 # only select an action every Kth frame, repeat prev for others
+
+'''
+Definitions:
+If we are in the state s_t and do action a_t, we get a reward r(s_t,a_t) (which may be stochastic) and 
+end up in state s_{t+1}(s_t,a_t).
+
+From state s_t, we want to maximize the optimal future discounted reward 
+Q*(s_t,a_t) = r(s_t,a_t) + gamma * r(s_{t+1},a_{t+1}* + gamma^2 * r(s_{t+2},a_{t+2}*) + ...,
+where a_t* = argmax_a Q*(s_t,a), i.e. the action that maximizes the future reward.
+
+So if we know Q*(s,a), we can use it to find the optimal action at every step.
+To compute it, we iterate with the Bellman equation:
+Q(s_t,a_t) := r(s_t,a_t) + gamma * max_a Q(s_{t+1},a).
+After many iterations, Q will approach Q* if:
+- We train on batches of random samples (s_t, a_t, r_t, s_{t+1}) from training runs
+- We avoid weight oscillations by temporarily freezing the Q function (=policy) used during training   
+
+'''
 
 def weight_variable(shape):
     initial = tf.truncated_normal(shape, stddev = 0.01)
@@ -27,54 +45,24 @@ def bias_variable(shape):
     initial = tf.constant(0.01, shape = shape)
     return tf.Variable(initial)
 
-def conv2d(x, W, stride):
-    return tf.nn.conv2d(x, W, strides = [1, stride, stride, 1], padding = "SAME")
-
-def max_pool_2x2(x):
-    return tf.nn.max_pool(x, ksize = [1, 2, 2, 1], strides = [1, 2, 2, 1], padding = "SAME")
-
 def createNetwork():
-    # network weights
-    W_conv1 = weight_variable([8, 8, 4, 32])
-    b_conv1 = bias_variable([32])
-
-    W_conv2 = weight_variable([4, 4, 32, 64])
-    b_conv2 = bias_variable([64])
-
-    W_conv3 = weight_variable([3, 3, 64, 64])
-    b_conv3 = bias_variable([64])
-    
-    W_fc1 = weight_variable([1600, 512])
-    b_fc1 = bias_variable([512])
-
-    W_fc2 = weight_variable([512, ACTIONS])
-    b_fc2 = bias_variable([ACTIONS])
+    # network weights - guessing that the 1*ACTIONS shape of b will be broadcast to None*ACTIONS
+    W_fc = weight_variable([11, ACTIONS])
+    b_fc = bias_variable([1, ACTIONS])
 
     # input layer
-    s = tf.placeholder("float", [None, 80, 80, 4])
+    s = tf.placeholder("float", [None, 11])
 
-    # hidden layers
-    h_conv1 = tf.nn.relu(conv2d(s, W_conv1, 4) + b_conv1)
-    h_pool1 = max_pool_2x2(h_conv1)
+    # readout layer - should get shape [None, ACTIONS]
+    readout = tf.matmul(s, W_fc) + b_fc
 
-    h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2, 2) + b_conv2)
-    #h_pool2 = max_pool_2x2(h_conv2)
+    return s, readout
 
-    h_conv3 = tf.nn.relu(conv2d(h_conv2, W_conv3, 1) + b_conv3)
-    #h_pool3 = max_pool_2x2(h_conv3)
-
-    #h_pool3_flat = tf.reshape(h_pool3, [-1, 256])
-    h_conv3_flat = tf.reshape(h_conv3, [-1, 1600])
-
-    h_fc1 = tf.nn.relu(tf.matmul(h_conv3_flat, W_fc1) + b_fc1)
-
-    # readout layer
-    readout = tf.matmul(h_fc1, W_fc2) + b_fc2
-
-    return s, readout, h_fc1
-
-def trainNetwork(s, readout, h_fc1, sess):
-    # define the cost function
+def trainNetwork(s, readout, sess):
+    # Define the cost function
+    # We'll let y be the right hand side of the Bellman equation above,
+    # and readout_action is the left hand side.
+    # We train the weights to make them equal.
     a = tf.placeholder("float", [None, ACTIONS])
     y = tf.placeholder("float", [None])
     readout_action = tf.reduce_sum(readout * a, reduction_indices = 1)
@@ -91,18 +79,14 @@ def trainNetwork(s, readout, h_fc1, sess):
     a_file = open("logs_" + GAME + "/readout.txt", 'w')
     h_file = open("logs_" + GAME + "/hidden.txt", 'w')
 
-    # get the first state by doing nothing and preprocess the image to 80x80x4
+    # get the first state by going straight
     do_nothing = np.zeros(ACTIONS)
-    do_nothing[0] = 1
-    x_t, r_0, terminal = game_state.frame_step(do_nothing)
-    x_t = np.ones((80,80))*x_t;
-    #x_t = cv2.cvtColor(cv2.resize(x_t, (80, 80)), cv2.COLOR_BGR2GRAY)
-    #ret, x_t = cv2.threshold(x_t,1,255,cv2.THRESH_BINARY)
-    s_t = np.stack((x_t, x_t, x_t, x_t), axis = 2)
+    do_nothing[1] = 1
+    s_t, r_0, terminal = game_state.frame_step(do_nothing)
 
     # saving and loading networks
     saver = tf.train.Saver()
-    sess.run(tf.initialize_all_variables())
+    tf.global_variables_initializer().run()
     checkpoint = tf.train.get_checkpoint_state("saved_networks")
     if checkpoint and checkpoint.model_checkpoint_path:
         saver.restore(sess, checkpoint.model_checkpoint_path)
@@ -112,8 +96,10 @@ def trainNetwork(s, readout, h_fc1, sess):
 
     epsilon = INITIAL_EPSILON
     t = 0
-    while "pigs" != "fly":
-        # choose an action epsilon greedily
+    while t<12000:
+        # Choose an action epsilon greedily
+        # (Feed state s_t to the current network to get output. From that we do argmax to find the best action.)
+        # Should we freeze this policy for a number of iterations, to avoid oscillations?
         readout_t = readout.eval(feed_dict = {s : [s_t]})[0]
         a_t = np.zeros([ACTIONS])
         action_index = 0
@@ -133,11 +119,7 @@ def trainNetwork(s, readout, h_fc1, sess):
 
         for i in range(0, K):
             # run the selected action and observe next state and reward
-            x_t1, r_t, terminal = game_state.frame_step(a_t)
-            #x_t1 = cv2.cvtColor(cv2.resize(x_t1_col, (80, 80)), cv2.COLOR_BGR2GRAY)
-            #ret, x_t1 = cv2.threshold(x_t1,1,255,cv2.THRESH_BINARY)
-            x_t1 = np.ones((80, 80, 1)) * x_t1;
-            s_t1 = np.append(x_t1, s_t[:,:,0:3], axis = 2)
+            s_t1, r_t, terminal = game_state.frame_step(a_t)
 
             # store the transition in D
             D.append((s_t, a_t, r_t, s_t1, terminal))
@@ -158,10 +140,12 @@ def trainNetwork(s, readout, h_fc1, sess):
             y_batch = []
             readout_j1_batch = readout.eval(feed_dict = {s : s_j1_batch})
             for i in range(0, len(minibatch)):
-                # if terminal only equals reward
                 if minibatch[i][4]:
+                    # If this was the last step, the future reward is simply what we got in this step
                     y_batch.append(r_batch[i])
                 else:
+                    # Otherwise, approximate future reward by discounted value of r(s',a*(s')),
+                    # where s' is the resulting state and a*(s') is the best action.
                     y_batch.append(r_batch[i] + GAMMA * np.max(readout_j1_batch[i]))
 
             # perform gradient step
@@ -198,8 +182,8 @@ def trainNetwork(s, readout, h_fc1, sess):
 
 def playGame():
     sess = tf.InteractiveSession()
-    s, readout, h_fc1 = createNetwork()
-    trainNetwork(s, readout, h_fc1, sess)
+    s, readout = createNetwork()
+    trainNetwork(s, readout, sess)
 
 def main():
     playGame()
