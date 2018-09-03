@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 # The Robot class and its dependencies, which describe the Osiris robot and its surroundings
 # Magnus Lindhé, 2018
 
@@ -43,6 +44,9 @@ class Robot:
 
         # Geometry of the robot
         self._robotShape = RobotShape()
+
+    def getRobotCenteredMap(self):
+        """Return a (sampled down) bitmap of the world, in the robot CS."""
 
     def drive(self, curve):
         """Update the robot pose based on the drive command and return reward."""
