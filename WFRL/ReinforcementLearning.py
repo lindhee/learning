@@ -4,6 +4,8 @@
 
 # See https://github.com/DanielSlater/PyGamePlayer/blob/master/examples/deep_q_pong_player.py for an example of how
 # to interface this to TensorFlow.
+# Or refer to its source:
+# https://github.com/asrivat1/DeepLearningVideoGames
 
 def epsilon(episodeIndex):
     """Return the probability of a random action, given the episode index."""
