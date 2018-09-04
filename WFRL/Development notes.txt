@@ -11,7 +11,23 @@ De ändringar som verkade göra att det blev bra, var:
 - Ändra steglängden för Adam-optimeringen till 1e-2.
 - Beräkna Q_hat med vikter W som fryses i 1000 tidssteg, för att undvika oscillationer i vikterna.
 
-Prova att ta bort frysningen och se om det var den viktigaste ändringen!
+Exempel på ganska bra värden, efter 30 000 iterationer:
+W = 
+[[-19.8  -14.8   -9.9   -5.96  -2.99  -1.    -0.    -1.    -2.99  -5.96   -9.9 ]
+ [-14.8   -9.9   -5.96  -3.1   -1.     0.    -1.    -2.99  -5.96  -9.9  -10.1 ]
+ [ -9.9   -5.96  -2.99  -1.    -0.    -1.    -3.    -5.96  -9.9  -14.8  -10.07]]
+ 
+Idealt skulle man få ungefär (bortsett från avklingningen gamma och att varje episod har begränsad längd):
+-20 -15 -10  -6  -3  -1   0  -1  -3   -6  -10
+-15 -10  -6  -3  -1   0  -1  -3  -6  -10  -15
+<...och sista raden är som första, fast spegelvänd>
+ 
+(Men notera att element (3,11) borde vara ca -20, så i den kolumnen blir det fel rangordning mellan de två sämsta alternativen, vilket iofs inte påverkar policyn.)
+
+Några fler experiment antyder att den viktigaste ändringen var att sätta rätt steglängd. Även om jag inte fryser W_hat så får man hyfsade värden när man ligger nånstans mellan 1e-1 och 1e-3.
+
+Förbättring:
+- Slumpa oftare ut ettan till ytterlägena, för det verkar som att vi tränar för lite där ute. Det är oftast där vi få dåliga värden.
 
 RL-bakgrund
 ===============
