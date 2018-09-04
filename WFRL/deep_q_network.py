@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# Adapted by Magnus Lindhe', 2018, from https://github.com/asrivat1/DeepLearningVideoGames
 # Intended for Python 2.7
 
 import tensorflow as tf
@@ -11,13 +12,14 @@ from collections import deque
 GAME = 'dummy' # the name of the game being played for log files
 ACTIONS = 3 # number of valid actions
 GAMMA = 0.99 # decay rate of past observations
-OBSERVE = 500. # timesteps to observe before training
-EXPLORE = 500. # frames over which to anneal epsilon
+OBSERVE = 2000. # timesteps to observe before training
+EXPLORE = 5000. # frames over which to anneal epsilon
 FINAL_EPSILON = 0.05 # final value of epsilon
 INITIAL_EPSILON = 1.0 # starting value of epsilon
-REPLAY_MEMORY = 5000 # number of previous transitions to remember
+REPLAY_MEMORY = 1000 # number of previous transitions to remember
 BATCH = 32 # size of minibatch
 K = 1 # only select an action every Kth frame, repeat prev for others
+NO_OF_ITERATIONS = 30000 # Number of time steps t
 
 '''
 Definitions:
@@ -48,26 +50,27 @@ def bias_variable(shape):
 def createNetwork():
     # network weights - guessing that the 1*ACTIONS shape of b will be broadcast to None*ACTIONS
     W_fc = weight_variable([11, ACTIONS])
-    b_fc = bias_variable([1, ACTIONS])
+    #b_fc = bias_variable([1, ACTIONS])
 
     # input layer
     s = tf.placeholder("float", [None, 11])
 
     # readout layer - should get shape [None, ACTIONS]
-    readout = tf.matmul(s, W_fc) + b_fc
+    #readout = tf.matmul(s, W_fc) + b_fc
+    readout = tf.matmul(s, W_fc) # Skip the bias, to make W more similar to Q
 
-    return s, readout
+    return s, readout, W_fc
 
-def trainNetwork(s, readout, sess):
+def trainNetwork(s, readout, W, sess):
     # Define the cost function
     # We'll let y be the right hand side of the Bellman equation above,
     # and readout_action is the left hand side.
     # We train the weights to make them equal.
     a = tf.placeholder("float", [None, ACTIONS])
     y = tf.placeholder("float", [None])
-    readout_action = tf.reduce_sum(readout * a, reduction_indices = 1)
+    readout_action = tf.reduce_sum(readout * a, reduction_indices = 1) # Q(s,a)
     cost = tf.reduce_mean(tf.square(y - readout_action))
-    train_step = tf.train.AdamOptimizer(1e-6).minimize(cost)
+    train_step = tf.train.AdamOptimizer(1e-2).minimize(cost)
 
     # open up a game state to communicate with emulator
     game_state = game.GameState()
@@ -88,24 +91,32 @@ def trainNetwork(s, readout, sess):
     saver = tf.train.Saver()
     tf.global_variables_initializer().run()
     checkpoint = tf.train.get_checkpoint_state("saved_networks")
+
+    '''
+    # Don't use this now - to avoid restoring bad weights 
+    
     if checkpoint and checkpoint.model_checkpoint_path:
         saver.restore(sess, checkpoint.model_checkpoint_path)
         print("Successfully loaded:", checkpoint.model_checkpoint_path)
     else:
         print("Could not find old network weights")
+    '''
 
     epsilon = INITIAL_EPSILON
     t = 0
-    while t<12000:
+    W_hat = W.eval()
+    while t<NO_OF_ITERATIONS:
         # Choose an action epsilon greedily
         # (Feed state s_t to the current network to get output. From that we do argmax to find the best action.)
         # Should we freeze this policy for a number of iterations, to avoid oscillations?
+        s_t = game_state.getState()
         readout_t = readout.eval(feed_dict = {s : [s_t]})[0]
         a_t = np.zeros([ACTIONS])
-        action_index = 0
 
+        used_random_action = False
         if random.random() <= epsilon or t <= OBSERVE:
             # Do random action with probability epsilon OR during the initial observation period
+            used_random_action = True
             action_index = random.randrange(ACTIONS)
             a_t[action_index] = 1
         else:
@@ -137,6 +148,11 @@ def trainNetwork(s, readout, sess):
             r_batch = [d[2] for d in minibatch]
             s_j1_batch = [d[3] for d in minibatch]
 
+            # Freeze the Q function and use it to compute y below.
+            # This prevents oscillations of the weights - see Q_hat in the Nature paper.
+            if t % 1000 == 0:
+                W_hat = W.eval()
+
             y_batch = []
             readout_j1_batch = readout.eval(feed_dict = {s : s_j1_batch})
             for i in range(0, len(minibatch)):
@@ -144,9 +160,11 @@ def trainNetwork(s, readout, sess):
                     # If this was the last step, the future reward is simply what we got in this step
                     y_batch.append(r_batch[i])
                 else:
-                    # Otherwise, approximate future reward by discounted value of r(s',a*(s')),
-                    # where s' is the resulting state and a*(s') is the best action.
-                    y_batch.append(r_batch[i] + GAMMA * np.max(readout_j1_batch[i]))
+                    # Otherwise, approximate future reward by
+                    # y = r + gamma * max_a' Q_hat(s',a'),
+                    # where Q_hat is based on the frozen weights W_hat
+                    Q_hat = np.max(np.matmul(np.reshape(s_j1_batch[i],(1,11)),W_hat))
+                    y_batch.append(r_batch[i] + GAMMA * Q_hat)
 
             # perform gradient step
             train_step.run(feed_dict = {
@@ -154,23 +172,32 @@ def trainNetwork(s, readout, sess):
                 a : a_batch,
                 s : s_j_batch})
 
+        # Print the last episodes, to see how the machine plays when trained
+        if t >= NO_OF_ITERATIONS-100:
+            if used_random_action:
+                randstring = "(random)"
+            else:
+                randstring = ""
+            print("t={0}: state={1} \t action={2} \t reward={3} \t {4}".format(t,s_t,a_t,r_t,randstring))
+            if terminal:
+                print("\n")
+
+        # "Q_MAX %e" % np.max(readout_t)
+
         # update the old values
         s_t = s_t1
         t += 1
 
         # save progress every 10000 iterations
-        if t % 10000 == 0:
+        if False and t % 10000 == 0:
             saver.save(sess, 'saved_networks/' + GAME + '-dqn', global_step = t)
 
-        # print info
-        state = ""
-        if t <= OBSERVE:
-            state = "observe"
-        elif t > OBSERVE and t <= OBSERVE + EXPLORE:
-            state = "explore"
-        else:
-            state = "train"
-        print("TIMESTEP", t, "/ STATE", state, "/ EPSILON", epsilon, "/ ACTION", action_index, "/ REWARD", r_t, "/ Q_MAX %e" % np.max(readout_t))
+        # Print W now and then
+        np.set_printoptions(precision=2, suppress=True)
+        if t % 100 == 0:
+            W_matrix = W.eval();
+            print("t = {0}: W = ".format(t))
+            print(np.transpose(W_matrix))
 
         # write info to files
         '''
@@ -182,8 +209,8 @@ def trainNetwork(s, readout, sess):
 
 def playGame():
     sess = tf.InteractiveSession()
-    s, readout = createNetwork()
-    trainNetwork(s, readout, sess)
+    s, readout, W = createNetwork()
+    trainNetwork(s, readout, W, sess)
 
 def main():
     playGame()

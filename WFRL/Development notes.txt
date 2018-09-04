@@ -1,8 +1,17 @@
 
 Att göra:
-- I would like to try adding some randomness to the game (control signal, or start state), so we excite more states.
+- Why doesn't W converge to something reasonable, and/or the game play to better scores? 
+- Do we need to freeze the policy we use and just update it every N steps, to avoid weight oscillation?
+- I would like to try adding some randomness to the control signal (or resulting state), so we excite more states.
 - Understand the Q_MAX value. Maybe print Q_MAX for each of the 11 states?
-- Investigate W. It should be easy to understand the three columns for left, straight and right.
+
+Om 11-vektorspelet
+=====================
+De ändringar som verkade göra att det blev bra, var:
+- Ändra steglängden för Adam-optimeringen till 1e-2.
+- Beräkna Q_hat med vikter W som fryses i 1000 tidssteg, för att undvika oscillationer i vikterna.
+
+Prova att ta bort frysningen och se om det var den viktigaste ändringen!
 
 RL-bakgrund
 ===============
