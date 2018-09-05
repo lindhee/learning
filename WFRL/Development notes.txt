@@ -27,7 +27,10 @@ Idealt skulle man få ungefär (bortsett från avklingningen gamma och att varje
 Några fler experiment antyder att den viktigaste ändringen var att sätta rätt steglängd. Även om jag inte fryser W_hat så får man hyfsade värden när man ligger nånstans mellan 1e-1 och 1e-3.
 
 Förbättring:
-- Slumpa oftare ut ettan till ytterlägena, för det verkar som att vi tränar för lite där ute. Det är oftast där vi få dåliga värden.
+Jag provade att slumpa ett index mellan -4 och 14 och sen låta [-4,0] mappas till 0 osv. Det gör att spelet oftare startar i ytterkanterna, så att vi får fler erfarenheter av att vara där. Sen tränade jag 100 gånger (30 000 iterationer per gång, med steglängd 1e-2, se commit f5e0cfdab095b). Varje resulterande W sparade jag som en radvektor i resulting_weights_padding.txt.
+Sen gick jag tillbaka till att slumpa i intervallet [0,10] och träna 100 ggr igen, med i övrigt oförändrade parametrar. Resultatet finns i resulting_weights_no_padding.txt.
+När jag plottar standardavvikelsen för vikterna i båda fallen (se plotWeightVariations.m), ser man att vikterna för yttersta fallen får tydligt mindre variation när man ser till att samla extra erfarenhet av ytterfallen. Samtidigt innebär väl det att man kanske tränar nätverket på lite fel fördelning av spel?
+
 
 RL-bakgrund
 ===============
@@ -42,7 +45,7 @@ Om det finns ett ändligt antal aktioner a och tillstånd s, kan vi göra en tab
 Q(s,a) := r' + \lambda max_{a'} Q(s',a').
 Om vi kör detta massor av gånger, så går Q(s,a) mot Q*(s,a).
 - Det kräver förstås att vi testar alla tillstånd och aktioner många gånger.
-- Fallgropar för konvergens?
+- Nature-artikeln påpekar två viktiga saker för att få konvergens: Dels bör man frysa vikterna som man använder för att beräkna Q i HL av Bellmans ekvation (för att undvika oscillation av vikterna), dels bör man samla ihop en bank av sampel (s,a,r',s') som man sedan drar slumpmässigt ifrån för att få sina minibatcher. Då får man bort korrelationen mellan sampel som ligger nära varandra i tiden.
 
 Om s har väldigt hög dimension (t.ex. består av en bild med en massa pixlar), kan det vara opraktiskt att iterera Bellmans ekvation över en tabell med alla tillstånd. Då kan vi istället träna ett neuralt nätverk till att approximera Q(s,a). För varje drag får vi en tupel (s,a,r',s') och modifierar vikterna w för att 
 Q(s,a,w) ska gå mot (det kända) värdet T = r' + \lambda max_{a'} Q(s',a',\bar w), där \bar w hålls konstant medan vi gör SGD på varje batch.

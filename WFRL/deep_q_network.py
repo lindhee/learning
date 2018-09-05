@@ -217,6 +217,8 @@ def playGame():
         W_final = trainNetwork(s, readout, W, sess)
         np.savetxt(weight_file, np.reshape(W_final,(1,-1)))
 
+        print("Iteration no {0} done!".format(i))
+
 def main():
     playGame()
 
