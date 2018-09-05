@@ -206,11 +206,16 @@ def trainNetwork(s, readout, W, sess):
             h_file.write(",".join([str(x) for x in h_fc1.eval(feed_dict={s:[s_t]})[0]]) + '\n')
             cv2.imwrite("logs_tetris/frame" + str(t) + ".png", x_t1)
         '''
+    return W.eval()
 
 def playGame():
-    sess = tf.InteractiveSession()
-    s, readout, W = createNetwork()
-    trainNetwork(s, readout, W, sess)
+    weight_file = open("resulting_weights.txt", 'w')
+    weight_file.write("# Resulting weight matrix W - one training session per row")
+    for i in range(1,100):
+        sess = tf.InteractiveSession()
+        s, readout, W = createNetwork()
+        W_final = trainNetwork(s, readout, W, sess)
+        np.savetxt(weight_file, np.reshape(W_final,(1,-1)))
 
 def main():
     playGame()

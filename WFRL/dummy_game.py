@@ -23,8 +23,18 @@ Every ten steps, a new episode starts.
 
 class GameState:
     def __init__(self):
+        self._resetState()
+
+    def _resetState(self):
         self.steps = 0
-        self.n = random.randrange(0,10) # Index of the (random) initial occupied cell
+
+        # Having this >0 creates a bias towards starting at cells 0 or 10,
+        # which is important to get enough "experience" of those states
+        OUTSIDE_PADDING = 4
+
+        x = random.randrange(-OUTSIDE_PADDING, 10+OUTSIDE_PADDING)
+        self.n = np.clip(x, 0, 10)   # Index of the (random) initial occupied cell
+        assert(self.n>=0 and self.n<=10)
 
     def getState(self):
         # Draw the "image"
@@ -63,7 +73,6 @@ class GameState:
         terminal = False
         if self.steps >= 10:
             terminal = True
-            self.steps = 0
-            self.n = random.randrange(0, 10)
+            self._resetState()
 
         return screen, reward, terminal
