@@ -1,9 +1,13 @@
 
-Att göra:
-- Why doesn't W converge to something reasonable, and/or the game play to better scores? 
-- Do we need to freeze the policy we use and just update it every N steps, to avoid weight oscillation?
-- I would like to try adding some randomness to the control signal (or resulting state), so we excite more states.
-- Understand the Q_MAX value. Maybe print Q_MAX for each of the 11 states?
+Om väggföljningsspelet
+========================
+Prova att använda Pygame. Borde vara enkelt att läsa in en svartvit bitmap som bakgrund och så rita en rörlig bild av roboten ovanpå.
+För att få utdata i form av en bitmap i robotens koordinatsystem, borde man kunna klippa ut en bit av bakgrundsbilden och sen använda pygame.transform.rotozoom() för att rotera och skala ner den. Sen kan man omvandla bilden till en numpy-array med pygame.surfarray.array2d(). Då kan vi först räkna hur många pixlar inuti roboten som har hinder i sig (=kollision) och sen skicka vidare resten av bilden som utsignal till RL-motorn.
+
+För att byta färg på städade väggsegment, borde man kunna använda pygame.Surface.get_at() och .set_at().
+
+Kanske behöver man byta till Python 3, för PyGame kör det?
+
 
 Om 11-vektorspelet
 =====================
