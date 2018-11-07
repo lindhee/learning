@@ -1,9 +1,33 @@
 
 Att göra:
-- Why doesn't W converge to something reasonable, and/or the game play to better scores? 
-- Do we need to freeze the policy we use and just update it every N steps, to avoid weight oscillation?
-- I would like to try adding some randomness to the control signal (or resulting state), so we excite more states.
 - Understand the Q_MAX value. Maybe print Q_MAX for each of the 11 states?
+
+Börja på en enkel WF-version
+==============================
+Använd pygames surfarray-typ.
+
+Tillstånd: 
+Roboten (en bitmap av röda pixlar) befinner sig i (x,y,theta) ovanpå en vit bild där svarta pixlar bildar väggar.
+
+I varje drag: 
+- Spelaren får välja en aktion bland ~9 körvektorer (från vänster centrumsväng, via rakt framåt till höger centrumsväng).
+- Vi uppdaterar robotens pose.
+- Vi hittar alla svarta bakgrundspixlar som ligger inom R pixlar från främre högra hörnet. De blir "städade" och byter färg till gröna.
+- Vi samplar bakgrundbilden inom en rektangel (större än roboten) kring robotpositionen.
+- Vi ritar roboten i sin nya pose.
+- Vi samplar samma rektangel igen, och hittar alla pixlar som bytt färg från svart/grön till röd (=kollision).
+- Spelaren får +1 poäng för varje svart pixel som byter färg och -1 poäng för varje röd pixel som ligger ovanpå en svart eller grön pixel.
+- Vi roterar den andra rektangeln -theta och samplar ner den. Sen gör vi en binär matris som visar världen i robotens koordinatsystem och där element med 1 betyder att det finns ett hinder i den punkten. Det blir indata till spelaren, tillsammans med poängen.
+
+Använd pygame.transform på en Surface för att skala och rotera.
+Använd Surface.blit för att rita den ovanpå en annan Surface. Man kan också ange att vissa delar av en Surface är transparenta.
+
+Vi skulle kunna göra hindren (och ytterväggen) massiva för att få högre straff på att kollidera. Men då måste vi göra skillnad på kantpixlar (som ger poäng när man städar dem) och inre pixlar (som bara ger straff vid kollision), så att inte sidborsten tjänar på att gå in långt in i väggen.
+
+Q-funktionen skulle då vara ett neuralt nätverk som, givet bilden s, ger en poäng åt varje körvektor. Vi borde kunna börja med ett enlagers nätverk, där vikterna för varje körvektor borde gå att tolka som en heatmap för vilka hinder som talar för eller emot den körvektorn.
+
+Gör en ny version av dummy_game, som vi kan provköra mot med en testfkn.
+
 
 Om 11-vektorspelet
 =====================
